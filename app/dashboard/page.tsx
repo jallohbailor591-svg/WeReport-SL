@@ -106,16 +106,16 @@ export default async function DashboardPage() {
           {/* Charts Grid */}
           <div className="grid lg:grid-cols-2 gap-6 mb-8">
             <div className="bg-card border border-border rounded-xl p-6 hover:shadow-md transition-all">
-              <ResolutionChart data={analytics.issuesByStatus} />
+              <ResolutionChart />
             </div>
             <div className="bg-card border border-border rounded-xl p-6 hover:shadow-md transition-all">
-              <DepartmentPerformance data={analytics.issuesByCategory} />
+              <DepartmentPerformance />
             </div>
           </div>
 
           {/* Time Series Chart */}
           <div className="bg-card border border-border rounded-xl p-6 hover:shadow-md transition-all mb-8">
-            <TimeSeriesChart data={analytics.issuesTrend} />
+            <TimeSeriesChart />
           </div>
 
           {/* Priority Table */}

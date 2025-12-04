@@ -6,9 +6,9 @@ import { successResponse, errorResponse, notFoundResponse, serverErrorResponse }
 import { z } from "zod"
 
 // GET single issue by ID
-export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params
+    const { id } = await context.params
     
     if (!id || !z.string().uuid().safeParse(id).success) {
       return errorResponse("Invalid issue ID", 400)
@@ -28,10 +28,10 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 }
 
 // PUT update issue
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAuth()
-    const { id } = params
+    const { id } = await context.params
     
     if (!id || !z.string().uuid().safeParse(id).success) {
       return errorResponse("Invalid issue ID", 400)
@@ -72,10 +72,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE issue
-export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAuth()
-    const { id } = params
+    const { id } = await context.params
     
     if (!id || !z.string().uuid().safeParse(id).success) {
       return errorResponse("Invalid issue ID", 400)

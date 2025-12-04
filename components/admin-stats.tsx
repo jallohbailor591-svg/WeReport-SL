@@ -8,7 +8,7 @@ interface AdminStatsProps {
   userId: string
 }
 
-export function AdminStats({ userId }: AdminStatsProps) {
+export function AdminStats({ userId: _userId }: AdminStatsProps) {
   const [stats, setStats] = useState({
     totalIssues: 0,
     pendingIssues: 0,

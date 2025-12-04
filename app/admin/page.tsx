@@ -1,5 +1,3 @@
-"use client"
-
 import { redirect } from "next/navigation"
 import { createServerClient_ } from "@/lib/supabase-server"
 import { Navigation } from "@/components/navigation"

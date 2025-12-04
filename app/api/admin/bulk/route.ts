@@ -7,7 +7,7 @@ import { successResponse, errorResponse, serverErrorResponse } from "@/lib/api-r
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireAdmin()
+    await requireAdmin()
     const body = await request.json()
 
     const validation = validateData(BulkModerationSchema, body)

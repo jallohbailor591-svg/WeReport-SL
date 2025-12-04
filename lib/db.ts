@@ -159,7 +159,7 @@ export async function searchIssues(filters: {
       // Provide a clearer hint when Supabase returns an empty error object (common when
       // the schema hasn't been created yet in a fresh Supabase project).
       const enhancedError =
-        Object.keys(error as Record<string, unknown>).length === 0
+        Object.keys(error as unknown as Record<string, unknown>).length === 0
           ? new Error(
               "Supabase returned an unknown error while querying `issues`. " +
                 "Make sure you have run the SQL in `scripts/001_create_issues_table.sql` and `scripts/001_add_indexes.sql` " +

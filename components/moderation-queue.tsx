@@ -21,7 +21,7 @@ interface ModerationQueueProps {
   userId: string
 }
 
-export function ModerationQueue({ userId }: ModerationQueueProps) {
+export function ModerationQueue({ userId: _userId }: ModerationQueueProps) {
   const [issues, setIssues] = useState<ModerationIssue[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState("pending")

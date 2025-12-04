@@ -4,10 +4,6 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
 
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-
   images: {
     remotePatterns: [
       {
@@ -67,17 +63,7 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
 
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      }
-    }
-    return config
-  },
+  turbopack: {},
 
   // Enable React strict mode for better error detection
   reactStrictMode: true,

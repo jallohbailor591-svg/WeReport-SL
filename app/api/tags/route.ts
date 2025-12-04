@@ -21,7 +21,7 @@ const CreateTagSchema = z.object({
   icon: z.string().max(10).optional(),
 })
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const tags = await getAllTags()
     return successResponse(tags, "Tags retrieved successfully")
@@ -46,7 +46,11 @@ export async function POST(request: NextRequest) {
       return errorResponse(validation.error, 400)
     }
 
-    const tag = await createTag(validation.data)
+    const tag = await createTag({
+      ...validation.data,
+      // Ensure color is always a non-optional string to satisfy Tag type
+      color: validation.data.color ?? "#000000",
+    })
 
     if (!tag) {
       return errorResponse("Failed to create tag", 500)

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Clear error logs (admin only)
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
   try {
     await requireAdmin()
 

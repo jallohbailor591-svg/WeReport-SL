@@ -4,54 +4,6 @@ import Link from "next/link"
 import { ArrowUpRight, ExternalLink } from "lucide-react"
 import { SAMPLE_PROBLEMS, getStatusBadge } from "@/lib/sample-data"
 
-const PRIORITY_RANKING = [
-  {
-    id: "5",
-    title: "Dangerous intersection needs traffic light",
-    location: "Intersection of Main Street and Oak Avenue",
-    priority: 98.5,
-    upvotes: 512,
-    severity: 95,
-    status: "pending",
-  },
-  {
-    id: "1",
-    title: "Large pothole on Main Street",
-    location: "Main Street",
-    priority: 87.3,
-    upvotes: 342,
-    severity: 75,
-    status: "in-progress",
-  },
-  {
-    id: "4",
-    title: "Overflowing garbage collection",
-    location: "Zone 3",
-    priority: 76.8,
-    upvotes: 234,
-    severity: 85,
-    status: "in-progress",
-  },
-  {
-    id: "2",
-    title: "Water supply interruption in Zone 3",
-    location: "Zone 3",
-    priority: 65.4,
-    upvotes: 156,
-    severity: 92,
-    status: "resolved",
-  },
-  {
-    id: "3",
-    title: "Broken street lights on Oak Avenue",
-    location: "Oak Avenue",
-    priority: 54.2,
-    upvotes: 89,
-    severity: 70,
-    status: "pending",
-  },
-]
-
 export function AdminTable() {
   const priorityRanking = SAMPLE_PROBLEMS.map((problem) => {
     const statusMultiplier = problem.status === "pending" ? 1.5 : problem.status === "in-progress" ? 1.2 : 0.8

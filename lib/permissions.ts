@@ -116,7 +116,7 @@ export async function getUserPermissions(userId: string): Promise<UserPermission
   return permissions[role]
 }
 
-export async function requireAuth(request?: NextRequest) {
+export async function requireAuth(_request?: NextRequest) {
   const user = await getCurrentUser()
 
   if (!user) {
@@ -149,7 +149,7 @@ export async function requirePermission(permission: keyof UserPermissions) {
 
 // Middleware helper to protect API routes
 export function withAuth(handler: (req: NextRequest, user: any) => Promise<NextResponse>) {
-  return async (req: NextRequest, ...args: any[]) => {
+  return async (req: NextRequest, ..._args: any[]) => {
     try {
       const user = await requireAuth(req)
       return await handler(req, user)
@@ -166,7 +166,7 @@ export function withAuth(handler: (req: NextRequest, user: any) => Promise<NextR
 }
 
 export function withAdmin(handler: (req: NextRequest, user: any) => Promise<NextResponse>) {
-  return async (req: NextRequest, ...args: any[]) => {
+  return async (req: NextRequest, ..._args: any[]) => {
     try {
       const user = await requireAdmin(req)
       return await handler(req, user)

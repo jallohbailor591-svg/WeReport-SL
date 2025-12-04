@@ -16,7 +16,7 @@ export interface AnalyticsData {
   topReporters: Array<{ id: string; name: string; count: number }>
 }
 
-export async function getAnalytics(startDate?: Date, endDate?: Date): Promise<AnalyticsData> {
+export async function getAnalytics(_startDate?: Date, _endDate?: Date): Promise<AnalyticsData> {
   try {
     const supabase = await createServerClient_()
 

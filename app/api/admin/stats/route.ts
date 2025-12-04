@@ -1,10 +1,9 @@
-import type { NextRequest } from "next/server"
 import { createServerClient_ } from "@/lib/supabase-server"
 import { requireAdmin } from "@/lib/permissions"
 import { successResponse, errorResponse, serverErrorResponse } from "@/lib/api-response"
 import { log } from "@/lib/logger"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await requireAdmin()
 

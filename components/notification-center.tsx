@@ -23,7 +23,6 @@ export function NotificationCenter({ userId }: NotificationCenterProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     fetchNotifications()

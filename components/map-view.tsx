@@ -5,16 +5,6 @@ import { SAMPLE_PROBLEMS, getStatusBadge } from "@/lib/sample-data"
 import { Heart, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-interface MapPin {
-  id: string
-  lat: number
-  lng: number
-  title: string
-  category: string
-  status: string
-  upvotes: number
-}
-
 export function MapView() {
   const router = useRouter()
   const [selectedPin, setSelectedPin] = useState<string | null>(null)

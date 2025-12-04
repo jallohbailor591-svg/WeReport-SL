@@ -6,11 +6,11 @@ export type NotificationType = "issue_update" | "comment_reply" | "issue_resolve
  * Send email notification to user
  * This is a placeholder - implement with your email service (Resend, SendGrid, etc.)
  */
-async function sendEmailNotification(
+export async function sendEmailNotification(
   userId: string,
   title: string,
   message: string,
-  type: NotificationType,
+  _type: NotificationType,
 ): Promise<void> {
   try {
     const supabase = await createServerClient_()
@@ -191,7 +191,7 @@ export async function notifyCommentReply(
   }
 }
 
-export async function notifyIssueAssignment(issueId: string, issueTitle: string, authorityId: string) {
+export async function notifyIssueAssignment(issueId: string, issueTitle: string, _authorityId: string) {
   try {
     const supabase = await createServerClient_()
 

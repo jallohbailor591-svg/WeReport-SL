@@ -87,6 +87,8 @@ export default function IssueDetailPage() {
                 ...sample,
                 createdAt: sample.reportedDate,
                 imageUrls: [sample.thumbnail],
+                latitude: sample.coordinates.lat,
+                longitude: sample.coordinates.lng,
               })
               setUpvoteCount(sample.upvotes)
             } else {
@@ -101,6 +103,8 @@ export default function IssueDetailPage() {
               ...sample,
               createdAt: sample.reportedDate,
               imageUrls: [sample.thumbnail],
+              latitude: sample.coordinates.lat,
+              longitude: sample.coordinates.lng,
             })
             setUpvoteCount(sample.upvotes)
           } else {
@@ -116,6 +120,8 @@ export default function IssueDetailPage() {
             ...sample,
             createdAt: sample.reportedDate,
             imageUrls: [sample.thumbnail],
+            latitude: sample.coordinates.lat,
+            longitude: sample.coordinates.lng,
           })
           setUpvoteCount(sample.upvotes)
         } else {

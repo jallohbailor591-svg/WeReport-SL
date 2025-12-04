@@ -135,7 +135,7 @@ export function ReportForm() {
         imageUrls = await Promise.all(
           formData.photos.map(async (photo) => {
             const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${photo.name}`
-            const { data, error } = await supabase.storage.from("issue-images").upload(`${user.id}/${fileName}`, photo)
+            const { error } = await supabase.storage.from("issue-images").upload(`${user.id}/${fileName}`, photo)
 
             if (error) throw error
 
