@@ -1,0 +1,204 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated color palette with modern green as primary accent */
+  /* Primary: Modern Emerald Green for civic engagement and environmental focus */
+  /* Secondary: Deep Teal for complementary actions */
+  /* Accent: Vibrant Orange for urgency */
+
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+
+  /* Primary color changed to emerald green */
+  --primary: 158 64% 52%;
+  --primary-foreground: 0 0% 100%;
+
+  /* Secondary updated to teal */
+  --secondary: 180 62% 45%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+
+  /* Accent remains orange for urgency indicators */
+  --accent: 24 95% 53%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 158 64% 52%;
+
+  --chart-1: 158 64% 52%;
+  --chart-2: 180 62% 45%;
+  --chart-3: 24 95% 53%;
+  --chart-4: 47 96% 53%;
+  --chart-5: 0 84% 60%;
+
+  --radius: 0.75rem;
+
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 222 47% 11%;
+  --sidebar-primary: 158 64% 52%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 180 62% 45%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 214 32% 91%;
+  --sidebar-ring: 158 64% 52%;
+}
+
+.dark {
+  /* Enhanced dark mode with better contrast */
+  --background: 222 47% 5%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 8%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 8%;
+  --popover-foreground: 210 40% 98%;
+
+  --primary: 158 64% 55%;
+  --primary-foreground: 222 47% 5%;
+
+  --secondary: 180 62% 50%;
+  --secondary-foreground: 222 47% 5%;
+
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+
+  --accent: 24 95% 60%;
+  --accent-foreground: 222 47% 5%;
+
+  --destructive: 0 84% 65%;
+  --destructive-foreground: 222 47% 5%;
+
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --ring: 158 64% 55%;
+
+  --chart-1: 158 64% 55%;
+  --chart-2: 180 62% 50%;
+  --chart-3: 24 95% 60%;
+  --chart-4: 47 96% 60%;
+  --chart-5: 0 84% 65%;
+
+  --sidebar: 222 47% 8%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-primary: 158 64% 55%;
+  --sidebar-primary-foreground: 222 47% 5%;
+  --sidebar-accent: 180 62% 50%;
+  --sidebar-accent-foreground: 222 47% 5%;
+  --sidebar-border: 217 33% 17%;
+  --sidebar-ring: 158 64% 55%;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-medium antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold text-foreground;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl font-bold;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl font-bold;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl font-bold;
+  }
+
+  h4 {
+    @apply text-lg font-bold;
+  }
+
+  p {
+    @apply text-base leading-relaxed;
+  }
+}
+
+/* Updated gradient utilities with green theme */
+@layer utilities {
+  .gradient-primary {
+    @apply bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500;
+  }
+
+  .gradient-accent {
+    @apply bg-gradient-to-br from-orange-500 via-orange-400 to-red-400;
+  }
+
+  .gradient-success {
+    @apply bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500;
+  }
+
+  .gradient-vibrant {
+    @apply bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500;
+  }
+
+  .shadow-glow-primary {
+    @apply shadow-lg shadow-emerald-500/20;
+  }
+
+  .shadow-glow-accent {
+    @apply shadow-lg shadow-orange-500/20;
+  }
+}
