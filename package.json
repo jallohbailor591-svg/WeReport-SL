@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev": "next dev",
     "build": "next build",
-    "dev": "next dev --webpack",
-    "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui",
-    "lint": "eslint .",
     "start": "next start",
+    "lint": "eslint .",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@edge-runtime/vm": "latest",
@@ -46,7 +46,6 @@
     "@radix-ui/react-tooltip": "latest",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
-    "@testing-library/dom": "latest",
     "@vercel/analytics": "latest",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
@@ -54,7 +53,6 @@
     "cmdk": "latest",
     "date-fns": "4.1.0",
     "embla-carousel-react": "latest",
-    "happy-dom": "latest",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",
     "next": "16.0.3",
@@ -71,7 +69,6 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "latest",
-    "vite": "latest",
     "zod": "3.25.76"
   },
   "devDependencies": {

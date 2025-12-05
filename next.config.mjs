@@ -63,8 +63,6 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
 
-  turbopack: {},
-
   // Enable React strict mode for better error detection
   reactStrictMode: true,
 
