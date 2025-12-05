@@ -135,9 +135,22 @@ export function ReportForm() {
         imageUrls = await Promise.all(
           formData.photos.map(async (photo) => {
             const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${photo.name}`
+            
+            // Check if bucket exists and has proper permissions
+            const { data: buckets } = await supabase.storage.listBuckets()
+            const bucketExists = buckets?.some(b => b.name === "issue-images")
+            
+            if (!bucketExists) {
+              console.warn("Issue images bucket not found, skipping image upload")
+              return null
+            }
+            
             const { error } = await supabase.storage.from("issue-images").upload(`${user.id}/${fileName}`, photo)
 
-            if (error) throw error
+            if (error) {
+              console.warn("Image upload failed:", error.message)
+              return null
+            }
 
             const {
               data: { publicUrl },
@@ -146,6 +159,8 @@ export function ReportForm() {
             return publicUrl
           }),
         )
+        // Filter out null values from failed uploads
+        imageUrls = imageUrls.filter((url): url is string => url !== null)
       }
 
       const response = await fetch("/api/issues", {
