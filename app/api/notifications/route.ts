@@ -26,6 +26,20 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createServerClient_()
+    
+    // Check if notifications table exists
+    const { data: tables, error: tableError } = await supabase
+      .from('information_schema.tables')
+      .select('table_name')
+      .eq('table_schema', 'public')
+      .eq('table_name', 'notifications')
+      .single()
+    
+    if (tableError || !tables) {
+      console.log("[API] Notifications table not found, returning empty array")
+      return successResponse([], "No notifications available")
+    }
+    
     let query = supabase.from("notifications").select("*").eq("user_id", userId)
 
     if (unreadOnly) {
