@@ -212,11 +212,14 @@ export function ReportForm() {
   const isStepValid = () => {
     switch (step) {
       case 1:
-        return formData.title && formData.description
+        return (
+          formData.title.length >= 10 &&
+          formData.description.length >= 20
+        )
       case 2:
-        return formData.category
+        return !!formData.category
       case 3:
-        return formData.location
+        return !!formData.location
       default:
         return false
     }
@@ -247,10 +250,10 @@ export function ReportForm() {
             <div key={s} className="flex flex-col items-center flex-1">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold mb-2 transition ${s === step
-                    ? "bg-primary text-primary-foreground"
-                    : s < step
-                      ? "bg-accent text-white"
-                      : "bg-muted text-muted-foreground"
+                  ? "bg-primary text-primary-foreground"
+                  : s < step
+                    ? "bg-accent text-white"
+                    : "bg-muted text-muted-foreground"
                   }`}
               >
                 {s < step ? "✓" : s}
@@ -335,8 +338,8 @@ export function ReportForm() {
                     type="button"
                     onClick={() => setFormData((prev) => ({ ...prev, category: cat.id }))}
                     className={`p-4 border-2 rounded-lg text-left transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${formData.category === cat.id
-                        ? "border-primary bg-primary/5 ring-2 ring-primary"
-                        : "border-border hover:border-primary/50"
+                      ? "border-primary bg-primary/5 ring-2 ring-primary"
+                      : "border-border hover:border-primary/50"
                       }`}
                     aria-pressed={formData.category === cat.id}
                     aria-label={`Select ${cat.label} category`}
