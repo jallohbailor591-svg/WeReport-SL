@@ -8,7 +8,7 @@ import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
   title: {
-    default: "WeReport - Sierra Leone Community Issues Platform",
+    default: "WeReport - Sierra Leone (Live v2.1)",
     template: "%s | WeReport",
   },
   description:
