@@ -115,6 +115,90 @@ export async function searchIssues(filters: {
   offset?: number
 }): Promise<Issue[]> {
   try {
+    // Skip database operations if credentials are not configured
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder")) {
+      console.warn("[DB] Skipping search - using placeholder credentials")
+      // Return demo data for testing
+      const demoIssues: Issue[] = [
+        {
+          id: "demo-1",
+          title: "Broken street light on Main Street",
+          description: "The street light at the corner of Main Street and 5th Avenue has been broken for two weeks",
+          category: "infrastructure",
+          status: "pending",
+          upvotes: 15,
+          created_at: new Date(Date.now() - 86400000).toISOString(),
+          updated_at: new Date(Date.now() - 86400000).toISOString(),
+          user_id: "demo-user-1",
+          location: "Freetown",
+          severity: 2, // medium
+          coordinates: { lat: 8.4606, lng: -13.2317 }, // Freetown coordinates
+          image_urls: [],
+        },
+        {
+          id: "demo-2", 
+          title: "Overflowing garbage bin",
+          description: "Public garbage bin near the market is overflowing and needs immediate attention",
+          category: "sanitation",
+          status: "in-progress",
+          upvotes: 23,
+          created_at: new Date(Date.now() - 172800000).toISOString(),
+          updated_at: new Date(Date.now() - 86400000).toISOString(),
+          user_id: "demo-user-2",
+          location: "Bo",
+          severity: 3, // high
+          coordinates: { lat: 8.4606, lng: -13.2317 }, // Freetown coordinates
+          image_urls: [],
+        },
+        {
+          id: "demo-3",
+          title: "Pothole repair needed",
+          description: "Large pothole on the main road causing traffic issues",
+          category: "infrastructure",
+          status: "resolved",
+          upvotes: 8,
+          created_at: new Date(Date.now() - 259200000).toISOString(),
+          updated_at: new Date(Date.now() - 172800000).toISOString(),
+          user_id: "demo-user-3",
+          location: "Makeni",
+          severity: 1, // low
+          coordinates: { lat: 8.4606, lng: -13.2317 }, // Freetown coordinates
+          image_urls: [],
+        }
+      ]
+      
+      // Filter demo data based on search criteria
+      let filteredIssues = demoIssues
+      
+      if (filters.search && filters.search.trim()) {
+        const searchTerm = filters.search.toLowerCase()
+        filteredIssues = filteredIssues.filter(issue => 
+          issue.title.toLowerCase().includes(searchTerm) || 
+          issue.description.toLowerCase().includes(searchTerm)
+        )
+      }
+      
+      if (filters.category && filters.category !== "all") {
+        filteredIssues = filteredIssues.filter(issue => issue.category === filters.category)
+      }
+      
+      if (filters.status && filters.status !== "all") {
+        filteredIssues = filteredIssues.filter(issue => issue.status === filters.status)
+      }
+      
+      // Sort demo data
+      if (filters.sortBy === "upvotes") {
+        filteredIssues.sort((a, b) => b.upvotes - a.upvotes)
+      } else if (filters.sortBy === "newest") {
+        filteredIssues.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      } else {
+        // Trending
+        filteredIssues.sort((a, b) => b.upvotes - a.upvotes)
+      }
+      
+      return filteredIssues
+    }
+
     const supabase = await createServerClient_()
     
     // Build query with proper index usage
