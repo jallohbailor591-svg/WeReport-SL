@@ -12,25 +12,21 @@ async function generateIcons() {
     }
 
     try {
-        console.log('Generating icon-192.png...');
+        // Generate 192x192 PNG
         await sharp(INPUT_SVG)
             .resize(192, 192)
             .png()
             .toFile(path.join(PUBLIC_DIR, 'icon-192.png'));
 
-        console.log('Generating icon-512.png...');
+        // Generate 512x512 PNG
         await sharp(INPUT_SVG)
             .resize(512, 512)
             .png()
             .toFile(path.join(PUBLIC_DIR, 'icon-512.png'));
 
-        console.log('Success! Icons generated.');
+        console.log('Icons generated successfully!');
     } catch (error) {
-        if (error.code === 'MODULE_NOT_FOUND') {
-            console.error('Error: sharp is not installed. Please run "npm install sharp"');
-        } else {
-            console.error('Error generating icons:', error);
-        }
+        console.error('Error generating icons:', error);
         process.exit(1);
     }
 }
