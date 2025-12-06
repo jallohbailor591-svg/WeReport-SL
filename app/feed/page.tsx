@@ -38,7 +38,6 @@ export default async function FeedPage(props: PageProps) {
   ])
 
   const paginatedIssues = issues
-  const hasMore = issues.length >= limit
   const hasPrev = page > 1
 
   return (
