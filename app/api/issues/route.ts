@@ -8,15 +8,7 @@ import { successResponse, errorResponse, rateLimitResponse, serverErrorResponse 
 // GET all issues - returns real data only
 export async function GET(request: NextRequest) {
   try {
-    // Skip database operations if credentials are not configured
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder")) {
-      return successResponse([], "Issues retrieved successfully (demo mode)", {
-        limit: 50,
-        page: 1,
-        total: 0,
-        hasMore: false,
-      })
-    }
+
 
     const searchParams = request.nextUrl.searchParams
     const limit = Math.min(Number.parseInt(searchParams.get("limit") || "50"), 100)
