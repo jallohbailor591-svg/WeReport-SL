@@ -10,11 +10,13 @@ import { Input } from "@/components/ui/input"
 import { MapPin, Upload, Loader2, AlertCircle } from "lucide-react"
 
 const CATEGORIES = [
-  { id: "water", label: "Water Supply", emoji: "💧" },
-  { id: "waste", label: "Waste Management", emoji: "🗑️" },
-  { id: "roads", label: "Roads & Potholes", emoji: "🛣️" },
-  { id: "electricity", label: "Electricity", emoji: "⚡" },
+  { id: "infrastructure", label: "Infrastructure (Roads, Power)", emoji: "🛣️" },
+  { id: "sanitation", label: "Water & Sanitation", emoji: "💧" },
+  { id: "environment", label: "Environment & Waste", emoji: "🗑️" },
+  { id: "healthcare", label: "Healthcare", emoji: "🏥" },
+  { id: "education", label: "Education", emoji: "🎓" },
   { id: "safety", label: "Public Safety", emoji: "🚨" },
+  { id: "other", label: "Other", emoji: "📦" },
 ]
 
 const SEVERITY_OPTIONS = [
@@ -136,22 +138,22 @@ export function ReportForm() {
           formData.photos.map(async (photo) => {
             // Graceful image upload with fallback
             const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${photo.name}`
-            
+
             // Check if we have real Supabase credentials
             if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
               console.warn('Using placeholder credentials - skipping image upload gracefully')
               return null
             }
-            
+
             // Check if bucket exists and has proper permissions
             const { data: buckets } = await supabase.storage.listBuckets()
             const bucketExists = buckets?.some(b => b.name === "issue-images")
-            
+
             if (!bucketExists) {
               console.warn("Issue images bucket not found - report will be submitted without images")
               return null
             }
-            
+
             const { error } = await supabase.storage.from("issue-images").upload(`${user.id}/${fileName}`, photo)
 
             if (error) {
@@ -244,13 +246,12 @@ export function ReportForm() {
           {[1, 2, 3, 4].map((s) => (
             <div key={s} className="flex flex-col items-center flex-1">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold mb-2 transition ${
-                  s === step
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold mb-2 transition ${s === step
                     ? "bg-primary text-primary-foreground"
                     : s < step
                       ? "bg-accent text-white"
                       : "bg-muted text-muted-foreground"
-                }`}
+                  }`}
               >
                 {s < step ? "✓" : s}
               </div>
@@ -323,7 +324,7 @@ export function ReportForm() {
               <label className="block text-sm font-medium mb-4" id="category-label">
                 What category best describes this issue?
               </label>
-              <div 
+              <div
                 className="grid grid-cols-1 md:grid-cols-2 gap-3"
                 role="radiogroup"
                 aria-labelledby="category-label"
@@ -333,11 +334,10 @@ export function ReportForm() {
                     key={cat.id}
                     type="button"
                     onClick={() => setFormData((prev) => ({ ...prev, category: cat.id }))}
-                    className={`p-4 border-2 rounded-lg text-left transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                      formData.category === cat.id
+                    className={`p-4 border-2 rounded-lg text-left transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${formData.category === cat.id
                         ? "border-primary bg-primary/5 ring-2 ring-primary"
                         : "border-border hover:border-primary/50"
-                    }`}
+                      }`}
                     aria-pressed={formData.category === cat.id}
                     aria-label={`Select ${cat.label} category`}
                   >
@@ -407,7 +407,7 @@ export function ReportForm() {
                 </Button>
               </div>
               {locationError && (
-                <p 
+                <p
                   className="text-xs text-destructive mt-1 flex items-center gap-1"
                   role="alert"
                   aria-live="polite"
