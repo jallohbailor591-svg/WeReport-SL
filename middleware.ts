@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-// Next.js 16 expects a `proxy` function export in this file.
-export async function proxy(request: NextRequest) {
+// Next.js 16 expects a `middleware` function export in this file.
+export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -14,7 +14,7 @@ export async function proxy(request: NextRequest) {
 
   try {
     const { createServerClient } = await import("@supabase/ssr")
-    
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
