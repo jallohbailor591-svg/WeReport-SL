@@ -2,8 +2,8 @@ import { z } from "zod"
 
 // Issue validation schemas
 export const CreateIssueSchema = z.object({
-  title: z.string().min(10, "Title must be at least 10 characters").max(200, "Title too long"),
-  description: z.string().min(20, "Description must be at least 20 characters").max(5000, "Description too long"),
+  title: z.string().min(5, "Title must be at least 5 characters").max(200, "Title too long"),
+  description: z.string().min(5, "Description must be at least 5 characters").max(5000, "Description too long"),
   category: z.enum(["infrastructure", "sanitation", "safety", "environment", "healthcare", "education", "other"], {
     errorMap: () => ({ message: "Invalid category" }),
   }),

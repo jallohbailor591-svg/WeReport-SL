@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     shortcut: "/app-icon-192.png",
     apple: "/apple-icon.png",
   },
-  manifest: "/manifest.json",
+  manifest: "/site.webmanifest",
   generator: "v0.app",
 }
 
