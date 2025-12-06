@@ -1,4 +1,5 @@
 import { createServerClient_ } from "./supabase-server"
+import { logger } from "./logger"
 
 export type Issue = {
   id: string
@@ -24,7 +25,7 @@ export async function getIssues(limit = 50, offset = 0): Promise<Issue[]> {
     const supabase = await createServerClient_()
     const safeLimit = Math.min(limit, 100) // Cap at 100
     const safeOffset = Math.max(offset, 0)
-    
+
     // Uses idx_issues_created_at index
     const { data, error } = await supabase
       .from("issues")
@@ -35,7 +36,7 @@ export async function getIssues(limit = 50, offset = 0): Promise<Issue[]> {
     if (error) throw error
     return data || []
   } catch (error) {
-    console.error("[DB] Error fetching issues:", error)
+    logger.error("[DB] Error fetching issues:", error)
     return []
   }
 }
@@ -49,7 +50,7 @@ export async function getIssueById(id: string): Promise<Issue | null> {
     if (error) throw error
     return data
   } catch (error) {
-    console.error("[v0] Error fetching issue:", error)
+    logger.error("[v0] Error fetching issue:", error)
     return null
   }
 }
@@ -72,7 +73,7 @@ export async function createIssue(issue: Omit<Issue, "id" | "created_at" | "upda
     if (error) throw error
     return data
   } catch (error) {
-    console.error("[v0] Error creating issue:", error)
+    logger.error("[v0] Error creating issue:", error)
     return null
   }
 }
@@ -86,7 +87,7 @@ export async function updateIssue(id: string, updates: Partial<Issue>): Promise<
     if (error) throw error
     return data
   } catch (error) {
-    console.error("[v0] Error updating issue:", error)
+    logger.error("[v0] Error updating issue:", error)
     return null
   }
 }
@@ -100,7 +101,7 @@ export async function deleteIssue(id: string): Promise<boolean> {
     if (error) throw error
     return true
   } catch (error) {
-    console.error("[v0] Error deleting issue:", error)
+    logger.error("[v0] Error deleting issue:", error)
     return false
   }
 }
@@ -117,7 +118,7 @@ export async function searchIssues(filters: {
   try {
     // Skip database operations if credentials are not configured
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder")) {
-      console.warn("[DB] Skipping search - using placeholder credentials")
+      logger.warn("[DB] Skipping search - using placeholder credentials")
       // Return demo data for testing
       const demoIssues: Issue[] = [
         {
@@ -136,7 +137,7 @@ export async function searchIssues(filters: {
           image_urls: [],
         },
         {
-          id: "demo-2", 
+          id: "demo-2",
           title: "Overflowing garbage bin",
           description: "Public garbage bin near the market is overflowing and needs immediate attention",
           category: "sanitation",
@@ -166,26 +167,26 @@ export async function searchIssues(filters: {
           image_urls: [],
         }
       ]
-      
+
       // Filter demo data based on search criteria
       let filteredIssues = demoIssues
-      
+
       if (filters.search && filters.search.trim()) {
         const searchTerm = filters.search.toLowerCase()
-        filteredIssues = filteredIssues.filter(issue => 
-          issue.title.toLowerCase().includes(searchTerm) || 
+        filteredIssues = filteredIssues.filter(issue =>
+          issue.title.toLowerCase().includes(searchTerm) ||
           issue.description.toLowerCase().includes(searchTerm)
         )
       }
-      
+
       if (filters.category && filters.category !== "all") {
         filteredIssues = filteredIssues.filter(issue => issue.category === filters.category)
       }
-      
+
       if (filters.status && filters.status !== "all") {
         filteredIssues = filteredIssues.filter(issue => issue.status === filters.status)
       }
-      
+
       // Sort demo data
       if (filters.sortBy === "upvotes") {
         filteredIssues.sort((a, b) => b.upvotes - a.upvotes)
@@ -195,12 +196,12 @@ export async function searchIssues(filters: {
         // Trending
         filteredIssues.sort((a, b) => b.upvotes - a.upvotes)
       }
-      
+
       return filteredIssues
     }
 
     const supabase = await createServerClient_()
-    
+
     // Build query with proper index usage
     let query = supabase.from("issues").select("*", { count: "exact" })
 
@@ -245,19 +246,19 @@ export async function searchIssues(filters: {
       const enhancedError =
         Object.keys(error as unknown as Record<string, unknown>).length === 0
           ? new Error(
-              "Supabase returned an unknown error while querying `issues`. " +
-                "Make sure you have run the SQL in `scripts/001_create_issues_table.sql` and `scripts/001_add_indexes.sql` " +
-                "in your Supabase project so the `issues` table and its indexes/policies exist.",
-            )
+            "Supabase returned an unknown error while querying `issues`. " +
+            "Make sure you have run the SQL in `scripts/001_create_issues_table.sql` and `scripts/001_add_indexes.sql` " +
+            "in your Supabase project so the `issues` table and its indexes/policies exist.",
+          )
           : error
 
-      console.error("[DB] Error searching issues:", enhancedError)
+      logger.error("[DB] Error searching issues:", enhancedError)
       throw enhancedError
     }
 
     return data || []
   } catch (error) {
-    console.error("[DB] Error searching issues:", error)
+    logger.error("[DB] Error searching issues:", error)
     return []
   }
 }
@@ -285,7 +286,7 @@ export async function upvoteIssue(issueId: string, userId: string): Promise<bool
     if (updateError) throw updateError
     return true
   } catch (error) {
-    console.error("[v0] Error upvoting issue:", error)
+    logger.error("[v0] Error upvoting issue:", error)
     return false
   }
 }
@@ -307,7 +308,7 @@ export async function removeUpvote(issueId: string, userId: string): Promise<boo
     if (updateError) throw updateError
     return true
   } catch (error) {
-    console.error("[v0] Error removing upvote:", error)
+    logger.error("[v0] Error removing upvote:", error)
     return false
   }
 }
@@ -335,7 +336,7 @@ export async function addComment(
     if (error) throw error
     return data
   } catch (error) {
-    console.error("[v0] Error adding comment:", error)
+    logger.error("[v0] Error adding comment:", error)
     return null
   }
 }
@@ -355,7 +356,7 @@ export async function getCommentsForIssue(issueId: string): Promise<any[]> {
     if (error) throw error
     return data || []
   } catch (error) {
-    console.error("[DB] Error fetching comments:", error)
+    logger.error("[DB] Error fetching comments:", error)
     return []
   }
 }

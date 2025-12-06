@@ -4,25 +4,26 @@ import { UpdateIssueSchema, validateData } from "@/lib/validation"
 import { requireAuth } from "@/lib/permissions"
 import { successResponse, errorResponse, notFoundResponse, serverErrorResponse } from "@/lib/api-response"
 import { z } from "zod"
+import { logger } from "@/lib/logger"
 
 // GET single issue by ID
 export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params
-    
+
     if (!id || !z.string().uuid().safeParse(id).success) {
       return errorResponse("Invalid issue ID", 400)
     }
 
     const issue = await getIssueById(id)
-    
+
     if (!issue) {
       return notFoundResponse("Issue")
     }
 
     return successResponse(issue, "Issue retrieved successfully")
   } catch (error) {
-    console.error("[API] Error fetching issue:", error)
+    logger.error("[API] Error fetching issue:", error)
     return serverErrorResponse(error instanceof Error ? error : undefined)
   }
 }
@@ -32,7 +33,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
   try {
     const user = await requireAuth()
     const { id } = await context.params
-    
+
     if (!id || !z.string().uuid().safeParse(id).success) {
       return errorResponse("Invalid issue ID", 400)
     }
@@ -50,7 +51,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     const body = await request.json()
     const validation = validateData(UpdateIssueSchema, body)
-    
+
     if (!validation.success) {
       return errorResponse(validation.error, 400)
     }
@@ -66,7 +67,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     if (error instanceof Error && error.message.includes("Unauthorized")) {
       return errorResponse(error.message, 401)
     }
-    console.error("[API] Error updating issue:", error)
+    logger.error("[API] Error updating issue:", error)
     return serverErrorResponse(error instanceof Error ? error : undefined)
   }
 }
@@ -76,7 +77,7 @@ export async function DELETE(_request: NextRequest, context: { params: Promise<{
   try {
     const user = await requireAuth()
     const { id } = await context.params
-    
+
     if (!id || !z.string().uuid().safeParse(id).success) {
       return errorResponse("Invalid issue ID", 400)
     }
@@ -103,7 +104,7 @@ export async function DELETE(_request: NextRequest, context: { params: Promise<{
     if (error instanceof Error && error.message.includes("Unauthorized")) {
       return errorResponse(error.message, 401)
     }
-    console.error("[API] Error deleting issue:", error)
+    logger.error("[API] Error deleting issue:", error)
     return serverErrorResponse(error instanceof Error ? error : undefined)
   }
 }
