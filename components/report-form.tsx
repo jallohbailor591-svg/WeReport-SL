@@ -132,7 +132,7 @@ export function ReportForm() {
 
       let imageUrls: string[] = []
       if (formData.photos.length > 0) {
-        imageUrls = await Promise.all(
+        const uploadResults = await Promise.all(
           formData.photos.map(async (photo) => {
             const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${photo.name}`
             
@@ -160,7 +160,7 @@ export function ReportForm() {
           }),
         )
         // Filter out null values from failed uploads
-        imageUrls = imageUrls.filter((url): url is string => url !== null)
+        imageUrls = uploadResults.filter((url): url is string => url !== null)
       }
 
       const response = await fetch("/api/issues", {
