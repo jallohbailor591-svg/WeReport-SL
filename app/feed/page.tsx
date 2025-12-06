@@ -3,6 +3,7 @@ import { ProblemCardClient } from "@/components/problem-card-client"
 import { FeedFiltersClient } from "@/components/feed-filters-client"
 import { Zap } from "lucide-react"
 import { searchIssues } from "@/lib/db"
+import { getIssueStats } from "@/lib/db-stats"
 import { Suspense } from "react"
 import { FeedSkeleton } from "@/components/feed-skeleton"
 
@@ -23,16 +24,23 @@ export default async function FeedPage(props: PageProps) {
   const limit = 24
   const offset = (page - 1) * limit
 
-  const issues = await searchIssues({
-    search,
-    category,
-    status,
-    sortBy: sort || "newest",
-  })
+  // Fetch data in parallel
+  const [issues, stats] = await Promise.all([
+    searchIssues({
+      search,
+      category,
+      status,
+      sortBy: sort || "newest",
+      limit: limit,
+      offset: offset,
+    }),
+    getIssueStats()
+  ])
 
-  // Paginate results
-  const paginatedIssues = issues.slice(offset, offset + limit)
-  const hasMore = issues.length > offset + limit
+  const paginatedIssues = issues
+  const hasMore = issues.length >= limit // This is an approximation since we don't fetch n+1, but standard behavior is fine or we can match `limit` behavior if we fetched extra. 
+  // Actually, let's trust the current page size. If it's less than limit, we know we are done. If it matches limit, there MIGHT be more.
+  // Ideally we query count.
   const hasPrev = page > 1
 
   return (
@@ -52,7 +60,7 @@ export default async function FeedPage(props: PageProps) {
               <div className="hidden md:flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-800">
                 <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-                  {issues.length} Active
+                  {stats.total} Active
                 </span>
               </div>
             </div>
@@ -78,39 +86,38 @@ export default async function FeedPage(props: PageProps) {
                 </div>
               </Suspense>
 
-              {(hasPrev || hasMore) && (
-                <div className="flex justify-center gap-2 mb-16">
-                  {hasPrev && (
-                    <a
-                      href={`/feed?${new URLSearchParams({
-                        ...(search && { search }),
-                        ...(category && category !== "all" && { category }),
-                        ...(status && status !== "all" && { status }),
-                        ...(sort && sort !== "newest" && { sort }),
-                        page: (page - 1).toString(),
-                      })}`}
-                      className="px-4 py-2 border border-border rounded-lg hover:bg-muted hover:border-emerald-500 transition-all font-medium"
-                    >
-                      Previous
-                    </a>
-                  )}
-                  <span className="px-4 py-2 text-muted-foreground font-medium">Page {page}</span>
-                  {hasMore && (
-                    <a
-                      href={`/feed?${new URLSearchParams({
-                        ...(search && { search }),
-                        ...(category && category !== "all" && { category }),
-                        ...(status && status !== "all" && { status }),
-                        ...(sort && sort !== "newest" && { sort }),
-                        page: (page + 1).toString(),
-                      })}`}
-                      className="px-4 py-2 border border-border rounded-lg hover:bg-muted hover:border-emerald-500 transition-all font-medium"
-                    >
-                      Next
-                    </a>
-                  )}
-                </div>
-              )}
+              <div className="flex justify-center gap-2 mb-16">
+                {hasPrev && (
+                  <a
+                    href={`/feed?${new URLSearchParams({
+                      ...(search && { search }),
+                      ...(category && category !== "all" && { category }),
+                      ...(status && status !== "all" && { status }),
+                      ...(sort && sort !== "newest" && { sort }),
+                      page: (page - 1).toString(),
+                    })}`}
+                    className="px-4 py-2 border border-border rounded-lg hover:bg-muted hover:border-emerald-500 transition-all font-medium"
+                  >
+                    Previous
+                  </a>
+                )}
+                <span className="px-4 py-2 text-muted-foreground font-medium">Page {page}</span>
+                {/* Simple Next Logic: If we got a full page, assume there's a next page */}
+                {paginatedIssues.length === limit && (
+                  <a
+                    href={`/feed?${new URLSearchParams({
+                      ...(search && { search }),
+                      ...(category && category !== "all" && { category }),
+                      ...(status && status !== "all" && { status }),
+                      ...(sort && sort !== "newest" && { sort }),
+                      page: (page + 1).toString(),
+                    })}`}
+                    className="px-4 py-2 border border-border rounded-lg hover:bg-muted hover:border-emerald-500 transition-all font-medium"
+                  >
+                    Next
+                  </a>
+                )}
+              </div>
             </>
           ) : (
             <div className="text-center py-20 bg-card border border-border rounded-xl">
@@ -125,14 +132,14 @@ export default async function FeedPage(props: PageProps) {
           {/* Stats Section */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 border border-border rounded-xl p-8">
             {[
-              { label: "Total Issues", value: issues.length, icon: "📊" },
-              { label: "Resolved", value: issues.filter((p) => p.status === "resolved").length, icon: "✅" },
+              { label: "Total Issues", value: stats.total, icon: "📊" },
+              { label: "Resolved", value: stats.resolved, icon: "✅" },
               {
                 label: "In Progress",
-                value: issues.filter((p) => p.status === "in-progress").length,
+                value: stats.inProgress,
                 icon: "⚙️",
               },
-              { label: "Pending", value: issues.filter((p) => p.status === "pending").length, icon: "⏳" },
+              { label: "Pending", value: stats.pending, icon: "⏳" },
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="text-3xl mb-2">{stat.icon}</div>
