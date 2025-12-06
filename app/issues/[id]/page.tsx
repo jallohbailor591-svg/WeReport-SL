@@ -135,9 +135,18 @@ export default function IssueDetailPage() {
     fetchIssue()
   }, [id])
 
-  const handleUpvote = () => {
-    setUpvoted(!upvoted)
-    setUpvoteCount(upvoted ? upvoteCount - 1 : upvoteCount + 1)
+  const handleUpvote = async () => {
+    try {
+      const endpoint = upvoted ? `/api/issues/${id}/upvote/remove` : `/api/issues/${id}/upvote`
+      const response = await fetch(endpoint, { method: "POST" })
+
+      if (response.ok) {
+        setUpvoted(!upvoted)
+        setUpvoteCount(upvoted ? upvoteCount - 1 : upvoteCount + 1)
+      }
+    } catch (error) {
+      console.error("Failed to toggle upvote", error)
+    }
   }
 
   if (loading) {
@@ -179,25 +188,6 @@ export default function IssueDetailPage() {
       </>
     )
   }
-
-  const sampleComments = [
-    {
-      id: "1",
-      author: "James Robertson",
-      role: "City Official",
-      avatar: "🏛️",
-      text: "Thank you for reporting this. Our team is investigating.",
-      date: "Jan 16, 2025",
-    },
-    {
-      id: "2",
-      author: "Michael Chen",
-      role: "Community Member",
-      avatar: "👨",
-      text: "I also experienced this issue. Glad it's being addressed!",
-      date: "Jan 17, 2025",
-    },
-  ]
 
   return (
     <>
@@ -247,7 +237,7 @@ export default function IssueDetailPage() {
               {/* Comments */}
               <div className="space-y-4">
                 <h2 className="font-semibold text-lg">Community Discussion</h2>
-                <CommentsSection initialComments={sampleComments} />
+                <CommentsSection issueId={id} />
               </div>
             </div>
 
@@ -258,9 +248,8 @@ export default function IssueDetailPage() {
                 <CardContent className="pt-6 space-y-3">
                   <button
                     onClick={handleUpvote}
-                    className={`w-full py-3 px-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
-                      upvoted ? "bg-red-500 text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
-                    }`}
+                    className={`w-full py-3 px-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${upvoted ? "bg-red-500 text-white" : "bg-primary/10 text-primary hover:bg-primary/20"
+                      }`}
                   >
                     <Heart className={`w-5 h-5 ${upvoted ? "fill-current" : ""}`} />
                     {upvoted ? "Upvoted" : "Upvote"} ({upvoteCount})

@@ -1,49 +1,78 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 
 interface Comment {
   id: string
-  author: string
-  role: string
-  avatar: string
-  text: string
-  date: string
+  content: string
+  created_at: string
+  profiles?: {
+    first_name: string
+    last_name: string
+    avatar_url: string
+  }
 }
 
-export function CommentsSection({ initialComments }: { initialComments: Comment[] }) {
-  const [comments, setComments] = useState(initialComments)
+export function CommentsSection({ issueId }: { issueId: string }) {
+  const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`/api/issues/${issueId}/comments`)
+        if (res.ok) {
+          const result = await res.json()
+          setComments(result.data || [])
+        }
+      } catch (error) {
+        console.error("Failed to load comments", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    if (issueId) fetchComments()
+  }, [issueId])
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newComment.trim()) return
 
     setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 500))
 
-    const comment: Comment = {
-      id: Math.random().toString(),
-      author: "Your Name",
-      role: "Community Member",
-      avatar: "👤",
-      text: newComment,
-      date: new Date().toLocaleDateString(),
+    try {
+      const res = await fetch(`/api/issues/${issueId}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: newComment }),
+      })
+
+      if (res.ok) {
+        const result = await res.json()
+        // Optimistically add or re-fetch. Let's simple re-fetch or append if we have profile data
+        // For simplicity, just append with a placeholder profile until refresh, or rely on re-fetch
+        // Re-fetching is safer for data consistency
+        const commentsRes = await fetch(`/api/issues/${issueId}/comments`)
+        const commentsData = await commentsRes.json()
+        setComments(commentsData.data || [])
+        setNewComment("")
+      }
+    } catch (error) {
+      console.error("Failed to post comment", error)
+    } finally {
+      setIsSubmitting(false)
     }
-
-    setComments([comment, ...comments])
-    setNewComment("")
-    setIsSubmitting(false)
   }
+
+  if (isLoading) return <div className="text-center py-4 text-muted-foreground">Loading comments...</div>
 
   return (
     <div className="space-y-6">
-      {/* New Comment Form */}
       <form onSubmit={handleSubmitComment} className="bg-muted/50 rounded-lg p-4 space-y-3">
         <textarea
           placeholder="Share your thoughts or provide updates on this issue..."
@@ -63,26 +92,35 @@ export function CommentsSection({ initialComments }: { initialComments: Comment[
         </div>
       </form>
 
-      {/* Comments List */}
       <div className="space-y-4">
-        {comments.map((comment) => (
-          <div key={comment.id} className="bg-card border border-border rounded-lg p-4 space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="text-2xl">{comment.avatar}</div>
-              <div className="flex-1">
-                <p className="font-semibold text-sm">{comment.author}</p>
-                <p className="text-xs text-muted-foreground">
-                  {comment.role} • {comment.date}
-                </p>
+        {comments.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center italic">No comments yet. Be the first to reply!</p>
+        ) : (
+          comments.map((comment) => (
+            <div key={comment.id} className="bg-card border border-border rounded-lg p-4 space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="text-2xl">
+                  {comment.profiles?.avatar_url ? (
+                    <img src={comment.profiles.avatar_url} className="w-8 h-8 rounded-full" alt="User" />
+                  ) : (
+                    "👤"
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-sm">
+                    {comment.profiles?.first_name
+                      ? `${comment.profiles.first_name} ${comment.profiles.last_name || ""}`
+                      : "User"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(comment.created_at).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{comment.content}</p>
             </div>
-            <p className="text-sm leading-relaxed">{comment.text}</p>
-            <div className="flex gap-4 pt-2">
-              <button className="text-xs text-muted-foreground hover:text-foreground transition">Like</button>
-              <button className="text-xs text-muted-foreground hover:text-foreground transition">Reply</button>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   )
