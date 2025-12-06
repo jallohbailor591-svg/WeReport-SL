@@ -1,60 +1,19 @@
-const fs = require('fs');
-const path = require('path');
-const { createClient } = require('@supabase/supabase-js');
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient_ } from "@/lib/supabase-server";
 
-// Function to manually parse .env files since dotenv can be finicky with paths
-function loadEnv() {
-    const envFiles = ['.env.local', '.env'];
-    const envVars = {};
-
-    for (const file of envFiles) {
-        // Look in parent directory since we are in /scripts
-        const filePath = path.join(__dirname, '..', file);
-        if (fs.existsSync(filePath)) {
-            console.log(`Loading env from ${file}...`);
-            const content = fs.readFileSync(filePath, 'utf8');
-            content.split('\n').forEach(line => {
-                const match = line.match(/^([^=]+)=(.*)$/);
-                if (match) {
-                    const key = match[1].trim();
-                    const value = match[2].trim().replace(/^["']|["']$/g, ''); // Remove quotes
-                    if (key && value && !key.startsWith('#')) {
-                        envVars[key] = value;
-                    }
-                }
-            });
-        }
-    }
-    return envVars;
-}
-
-const loadedEnv = loadEnv();
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || loadedEnv.NEXT_PUBLIC_SUPABASE_URL;
-// Prefer Service Role Key for seeding, fallback to Anon key
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || loadedEnv.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || loadedEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-    console.error("❌ Missing Supabase credentials.");
-    console.error("   Please ensure .env.local exists in the project root and contains:");
-    console.error("   - NEXT_PUBLIC_SUPABASE_URL");
-    console.error("   - SUPABASE_SERVICE_ROLE_KEY (preferred) OR NEXT_PUBLIC_SUPABASE_ANON_KEY");
-    process.exit(1);
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const SEED_SECRET = "wereport-seed-2025";
 
 const realIssues = [
     {
         title: "Connaught Hospital Oxygen Shortage",
         description: "Critical shortage of oxygen cylinders in the emergency ward at Connaught Hospital. Multiple patients in critical condition are at risk due to lack of supply.",
         category: "healthcare",
-        severity: 3, // High
+        severity: 3,
         status: "in-progress",
         location: "Freetown",
         coordinates: { lat: 8.484, lng: -13.234 },
         upvotes: 45,
         user_id: null,
-        created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -67,20 +26,18 @@ const realIssues = [
         coordinates: { lat: 8.435, lng: -13.205 },
         upvotes: 82,
         user_id: null,
-        created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
         title: "Blackout in Bo City for 3 Weeks",
         description: "Consistent power outage in Bo City center for over 3 weeks. Local businesses are suffering massive losses due to reliance on expensive generator fuel.",
         category: "electricity",
-        severity: 2, // Medium
+        severity: 2,
         status: "pending",
         location: "Bo",
         coordinates: { lat: 7.964, lng: -11.738 },
         upvotes: 112,
         user_id: null,
-        created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -93,7 +50,6 @@ const realIssues = [
         coordinates: { lat: 8.471, lng: -13.202 },
         upvotes: 67,
         user_id: null,
-        created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -106,7 +62,6 @@ const realIssues = [
         coordinates: { lat: 8.489, lng: -13.238 },
         upvotes: 34,
         user_id: null,
-        created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -119,7 +74,6 @@ const realIssues = [
         coordinates: { lat: 8.488, lng: -13.236 },
         upvotes: 95,
         user_id: null,
-        created_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -132,7 +86,6 @@ const realIssues = [
         coordinates: { lat: 9.588, lng: -11.551 },
         upvotes: 28,
         user_id: null,
-        created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -145,20 +98,18 @@ const realIssues = [
         coordinates: { lat: 7.876, lng: -11.189 },
         upvotes: 15,
         user_id: null,
-        created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
         title: "Rice Price Hike in Makeni Market",
         description: "Unjustified hike in the price of imported rice by local wholesalers in Makeni. A 50kg bag is now sold at unaffordable rates for daily earners.",
         category: "food-security",
-        severity: 1, // Low
+        severity: 1,
         status: "pending",
         location: "Makeni",
         coordinates: { lat: 8.882, lng: -12.046 },
         upvotes: 56,
         user_id: null,
-        created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -171,7 +122,6 @@ const realIssues = [
         coordinates: { lat: 8.641, lng: -10.971 },
         upvotes: 41,
         user_id: null,
-        created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -184,7 +134,6 @@ const realIssues = [
         coordinates: { lat: 8.472, lng: -13.278 },
         upvotes: 22,
         user_id: null,
-        created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -197,7 +146,6 @@ const realIssues = [
         coordinates: { lat: 7.636, lng: -10.902 },
         upvotes: 60,
         user_id: null,
-        created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -210,7 +158,6 @@ const realIssues = [
         coordinates: { lat: 8.572, lng: -12.593 },
         upvotes: 89,
         user_id: null,
-        created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -223,7 +170,6 @@ const realIssues = [
         coordinates: { lat: 8.484, lng: -13.229 },
         upvotes: 18,
         user_id: null,
-        created_at: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -236,7 +182,6 @@ const realIssues = [
         coordinates: { lat: 8.455, lng: -13.245 },
         upvotes: 53,
         user_id: null,
-        created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -249,7 +194,6 @@ const realIssues = [
         coordinates: { lat: 8.491, lng: -13.232 },
         upvotes: 104,
         user_id: null,
-        created_at: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -262,7 +206,6 @@ const realIssues = [
         coordinates: { lat: 8.468, lng: -13.208 },
         upvotes: 27,
         user_id: null,
-        created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -275,7 +218,6 @@ const realIssues = [
         coordinates: { lat: 8.466, lng: -13.262 },
         upvotes: 39,
         user_id: null,
-        created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -288,7 +230,6 @@ const realIssues = [
         coordinates: { lat: 8.475, lng: -13.242 },
         upvotes: 76,
         user_id: null,
-        created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     },
     {
@@ -301,44 +242,55 @@ const realIssues = [
         coordinates: { lat: 8.487, lng: -13.224 },
         upvotes: 31,
         user_id: null,
-        created_at: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
         image_urls: []
     }
 ];
 
-async function seedData() {
-    console.log(`🌱 Preparing to seed ${realIssues.length} real issues...`);
+export async function GET(request: NextRequest) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const secret = searchParams.get("secret");
 
-    // 1. Get a fallback User ID so issues aren't orphaned
-    let seedUserId = null;
-    const { data: users, error: userError } = await supabase.from('profiles').select('id').limit(1);
+        if (secret !== SEED_SECRET) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
 
-    if (users && users.length > 0) {
-        seedUserId = users[0].id;
-        console.log(`✅ Using existing user ID for attribution: ${seedUserId}`);
-    } else {
-        console.warn("⚠️ No profiles found. Attempting to insert with NULL user_id.");
-    }
+        const supabase = await createServerClient_();
 
-    // 2. Prepare data payload
-    const issuesToInsert = realIssues.map(issue => ({
-        ...issue,
-        user_id: seedUserId, // Attach to a real user if found, or null
-        coordinates: JSON.stringify(issue.coordinates), // Ensure correct format for Supabase
-        description: `${issue.description}\n\n[Source: Real-Seed-2025]` // Tagging content for easy filtering
-    }));
+        // 1. Get a fallback User ID
+        let seedUserId = null;
+        const { data: users } = await supabase.from("profiles").select("id").limit(1);
 
-    // 3. Batch Insert
-    const { data, error } = await supabase
-        .from('issues')
-        .insert(issuesToInsert)
-        .select();
+        if (users && users.length > 0) {
+            seedUserId = users[0].id;
+        }
 
-    if (error) {
-        console.error("❌ Error seeding data:", error.message);
-    } else {
-        console.log(`🚀 Successfully inserted ${data.length} new issues into the database!`);
+        // 2. Prepare payload
+        const issuesToInsert = realIssues.map(issue => ({
+            ...issue,
+            user_id: seedUserId,
+            coordinates: JSON.stringify(issue.coordinates),
+            description: `${issue.description}\n\n[Source: Real-Seed-2025]`
+        }));
+
+        // 3. Insert
+        const { data, error } = await supabase
+            .from("issues")
+            .insert(issuesToInsert)
+            .select();
+
+        if (error) {
+            console.error("Seeding error:", error);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+
+        return NextResponse.json({
+            success: true,
+            message: `Successfully seeded ${data.length} issues!`,
+            data
+        });
+
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
-
-seedData();
