@@ -134,21 +134,28 @@ export function ReportForm() {
       if (formData.photos.length > 0) {
         const uploadResults = await Promise.all(
           formData.photos.map(async (photo) => {
+            // Graceful image upload with fallback
             const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${photo.name}`
+            
+            // Check if we have real Supabase credentials
+            if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
+              console.warn('Using placeholder credentials - skipping image upload gracefully')
+              return null
+            }
             
             // Check if bucket exists and has proper permissions
             const { data: buckets } = await supabase.storage.listBuckets()
             const bucketExists = buckets?.some(b => b.name === "issue-images")
             
             if (!bucketExists) {
-              console.warn("Issue images bucket not found, skipping image upload")
+              console.warn("Issue images bucket not found - report will be submitted without images")
               return null
             }
             
             const { error } = await supabase.storage.from("issue-images").upload(`${user.id}/${fileName}`, photo)
 
             if (error) {
-              console.warn("Image upload failed:", error.message)
+              console.warn("Image upload failed:", error.message, "- continuing without this image")
               return null
             }
 
