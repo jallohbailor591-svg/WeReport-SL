@@ -37,10 +37,6 @@ export default async function FeedPage(props: PageProps) {
     getIssueStats()
   ])
 
-  const paginatedIssues = issues
-  const hasMore = issues.length >= limit // This is an approximation since we don't fetch n+1, but standard behavior is fine or we can match `limit` behavior if we fetched extra. 
-  // Actually, let's trust the current page size. If it's less than limit, we know we are done. If it matches limit, there MIGHT be more.
-  // Ideally we query count.
   const hasPrev = page > 1
 
   return (
